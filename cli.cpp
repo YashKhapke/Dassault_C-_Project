@@ -4,12 +4,50 @@
 
 using namespace std;
 
+// Menu Options
+
+MenuOption::MenuOption(int num, string l) {
+    number = num;
+    label = l;
+
+}
+
+Cli::Cli() {
+
+    MAIN_MENU_OPTIONS = {
+        MenuOption(1, "Manage 2D Shapes"),
+        MenuOption(2, "Manage 3D Shapes"),
+        MenuOption(3, "Exit Program")
+    };
+
+    SUB_MENU_OPTIONS = {
+        {1, {
+            MenuOption(1, "Add Shape"),
+            MenuOption(2, "Update Shape"),
+            MenuOption(3, "Delete Shape"),
+            MenuOption(4, "Search Shape"),
+            MenuOption(5, "Display All Shapes"),
+            MenuOption(6, "Go Back to Main Menu")
+        }},
+        {2, {
+            MenuOption(1, "Add Shape"),
+            MenuOption(2, "Update Shape"),
+            MenuOption(3, "Delete Shape"),
+            MenuOption(4, "Search Shape"),
+            MenuOption(5, "Display All Shapes"),
+            MenuOption(6, "Go Back to Main Menu")
+        }}
+    };
+}
+
+
 // Menu //
 
 void Cli::run() {
     int choice;
     while (true) {
-        cout << " #### Geometric Shapes ####- ";
+        cout << endl;
+        cout << "##### Geometric Shapes #####";
         cout << endl << endl;
         displayMainMenu();
         cout << "Enter your choice: ";
@@ -34,21 +72,18 @@ void Cli::run() {
 void Cli::displayMainMenu() {
    
     cout << "Main Menu\n";
-    cout << "1. Manage 2D Shapes\n";
-    cout << "2. Manage 3D Shapes\n";
-    cout << "3. Exit Program\n";
+    for (auto option : MAIN_MENU_OPTIONS) {
+        cout << option.number << ". " << option.label << endl;
+    }
 }
 
 void Cli::manage2DShapes() {
     int choice;
     while (true) {
         cout << "\n2D Shapes Menu\n";
-        cout << "1. Add Shape\n";
-        cout << "2. Update Shape\n";
-        cout << "3. Delete Shape\n";
-        cout << "4. Search Shape\n";
-        cout << "5. Display All Shapes\n";
-        cout << "6. Go Back to Main Menu\n";
+        for (auto option : SUB_MENU_OPTIONS[1]) {
+            cout << option.number << ". " << option.label << endl;
+        }
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -89,12 +124,9 @@ void Cli::manage3DShapes() {
     int choice;
     while (true) {
         cout << "\n3D Shapes Menu\n";
-        cout << "1. Add Shape\n";
-        cout << "2. Update Shape\n";
-        cout << "3. Delete Shape\n";
-        cout << "4. Search Shape\n";
-        cout << "5. Display All Shapes\n";
-        cout << "6. Go Back to Main Menu\n";
+        for (const auto option : SUB_MENU_OPTIONS[2]) {
+            cout << option.number << ". " << option.label << endl;
+        }
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -131,13 +163,18 @@ void Cli::manage3DShapes() {
 }
 
 
+
+
 //// Operations on Shapes ////
 
 void Cli::addShape(int choice,int f) {
     string name;
     cout << "Enter a unique name for the shape: ";
     cin >> name;
-
+    if (shapeMap.find(name) != shapeMap.end()) {
+        cout << "A shape with the name '" << name << "' already exists. Please enter a unique name." << endl;
+        return;
+    }
     if (f == 0) {
         // 2D Shapes
         switch (choice) {
@@ -162,7 +199,7 @@ void Cli::addShape(int choice,int f) {
             }
 
             double centerX, centerY;
-            cout << "Enter the center coordinates of the circle (x, y): ";
+            cout << "Enter the center coordinates of the circle: ";
             cin >> centerX >> centerY;
             shapeMap[name] = new Circle(radius, centerX, centerY);
             break;
@@ -408,52 +445,84 @@ void Cli::searchShape() {
 void Cli::displayAllShapes() {
     
     map<double, pair<string, string>> shapesByArea;
-    map<double, pair<string, string>> shapesByVolume;
+    map<double, pair<string, string>> shapesByPerimeter;
+    map<double, pair<string, string>> shapesByVolume;  
+    map<double, pair<string, string>> shapesBySurfaceArea;
 
     for ( auto pair : shapeMap) {
         if (Circle* circle = dynamic_cast<Circle*>(pair.second)) {
             double area = circle->area();
+            double perimeter = circle->perimeter();
             shapesByArea[area] = { pair.first, "Circle" };
+            shapesByPerimeter[perimeter] = { pair.first, "Circle" };
         }
         else if (Rectangle* rectangle = dynamic_cast<Rectangle*>(pair.second)) {
             double area = rectangle->area();
+            double perimeter = rectangle ->perimeter();
             shapesByArea[area] = { pair.first, "Rectangle" };
+            shapesByPerimeter[perimeter] = { pair.first, "Rectangle" };
         }
         else if (Square * square = dynamic_cast<Square*>(pair.second)) {
             double area = square->area();
+            double perimeter = square->perimeter();
             shapesByArea[area] = { pair.first, "Square" };
+            shapesByPerimeter[perimeter] = { pair.first, "Rectangle" };
         }
         else if (Sphere* sphere = dynamic_cast<Sphere*>(pair.second)) {
             double volume = sphere->volume();
+            double surfacarea = sphere->surfaceArea();
             shapesByVolume[volume] = { pair.first, "Sphere" };
+            shapesBySurfaceArea[surfacarea] = { pair.first, "Sphere" };
         }
         else if (Cuboid* cuboid = dynamic_cast<Cuboid*>(pair.second)) {
             double volume = cuboid->volume();
+            double surfacarea = cuboid->surfaceArea();
             shapesByVolume[volume] = { pair.first, "Cuboid" };
+            shapesBySurfaceArea[surfacarea] = { pair.first, "Cuboid" };
         }
         else if (Cube* cube = dynamic_cast<Cube*>(pair.second)) {
             double volume = cube->volume();
-            shapesByArea[volume] = { pair.first, "Cube" };
+            double surfacarea = cube->surfaceArea();
+            shapesByVolume[volume] = { pair.first, "Cube" };
+            shapesBySurfaceArea[surfacarea] = { pair.first, "Cube" };
         }
     }
 
     cout << endl;
-    cout << "#### Shapes sorted by area: ####\n";
+    cout << "#### Shapes sorted by Area: ####\n";
     for (auto pair : shapesByArea) {
         cout << "Name: " << pair.second.first << endl;
         cout << "Type: " << pair.second.second << endl;
-        cout << "Area: " << pair.first << endl;
-    
+        cout << "Area: " << pair.first << endl;   
+        cout << endl;
+    }
+    cout << endl;
+    cout << "#### Shapes sorted by Perimeter: ####\n";
+    for (auto pair : shapesByPerimeter) {
+        cout << "Name: " << pair.second.first << endl;
+        cout << "Type: " << pair.second.second << endl;
+        cout << "Perimeter: " << pair.first << endl;
+        cout << endl;
+    }
+    cout << endl;
+    cout << "#### Shapes sorted by SurfaceArea: ####\n";
+    for (auto pair : shapesBySurfaceArea) {
+        cout << "Name: " << pair.second.first << endl;
+        cout << "Type: " << pair.second.second << endl;
+        cout << "SurfaceArea: " << pair.first << endl;
+        cout << endl;
     }
 
     cout << endl;
-    cout << "##### Shapes sorted by volume: #####\n";
+    cout << "##### Shapes sorted by Volume: #####\n";
     for (auto pair : shapesByVolume) {
         cout << "Name: " << pair.second.first << endl;
         cout << "Type: " << pair.second.second << endl;
         cout << "Volume: " << pair.first << endl;
+        cout << endl;
       
     }
+
 }
 
 

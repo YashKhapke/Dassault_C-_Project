@@ -12,7 +12,7 @@ protected:
 
 public:
     Shape();
-    virtual ~Shape() {}
+    ~Shape() {}
     virtual void display() = 0;
     virtual void update() = 0;
 };
@@ -20,6 +20,7 @@ public:
 // 2D shapes //
 
 class TwoDShape : public Shape {
+
 public:
     virtual double area() = 0;
     virtual double perimeter()  = 0;

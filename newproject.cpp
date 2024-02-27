@@ -3,7 +3,7 @@
 
 int main() {
 
-    Cli cli({});
+    Cli cli;
     cli.run();
 
     return 0;

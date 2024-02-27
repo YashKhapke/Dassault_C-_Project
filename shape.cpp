@@ -11,10 +11,11 @@ Shape::Shape() : PI(3.1415) {}
 TwoDShape::~TwoDShape() {}
 void TwoDShape::update() {}
 void TwoDShape::display() {}
+
 //// 3d shape ////
+
 void ThreeDShape::update() {}
 void ThreeDShape::display() {}
-
 ThreeDShape::~ThreeDShape() {}
 
 
@@ -283,9 +284,7 @@ void Cube::setSide(double side) {
     this->side = side;
     pSquare->setSide(side);
 }
-void Cube::setSquare(Square* square) {
-    pSquare = square;
-}
+
 void Cube::display() {
     cout << "Type: Cube\n";
     cout << "Length: " << side <<endl;
@@ -298,4 +297,8 @@ void Cube::update() {
     std::cout << "Enter the new side length: ";
     std::cin >> newSide;
     setSide(newSide);
+}
+
+void Cube::setSquare(Square* square) {
+    pSquare = square;
 }
